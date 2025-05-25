@@ -12,6 +12,8 @@ int main() {
     // Define valor dos navios
     int navio1 = 3;
     int navio2 = 3;
+    int navio3 = 3;
+    int navio4 = 3;
 
     // Posiciona navio1 na linha 6, colunas 3, 4, 5 (índices: linha 6 = i=6, colunas j=3,4,5)
     tabuleiro[6][3] = navio1;
@@ -22,6 +24,16 @@ int main() {
     tabuleiro[0][6] = navio2;
     tabuleiro[1][6] = navio2;
     tabuleiro[2][6] = navio2;
+
+    // Posicionamento dos navios 3 e 4 em diagonais 
+    tabuleiro[1][1] = navio3;
+    tabuleiro[2][2] = navio3;
+    tabuleiro[3][3] = navio3;
+
+    tabuleiro[0][9] = navio4;
+    tabuleiro[1][8] = navio4;
+    tabuleiro[2][7] = navio4;
+
 
     // Exibe o tabuleiro com cabeçalho formatado (A-J para colunas, 1-10 para linhas)
     printf("Tabuleiro de Batalha Naval\n");
