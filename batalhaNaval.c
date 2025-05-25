@@ -1,41 +1,95 @@
 #include <stdio.h>
 
+// Tamanho do tabuleiro e das habilidades
+#define TAM 10
+#define HAB 5
+#define HAB_ORIGEM 2  // Centro de uma matriz 5x5
+
+// Função para sobrepor habilidade no tabuleiro
+void aplicarHabilidade(int tabuleiro[TAM][TAM], int habilidade[HAB][HAB], int origemLinha, int origemColuna) {
+    for (int i = 0; i < HAB; i++) {
+        for (int j = 0; j < HAB; j++) {
+            if (habilidade[i][j] == 1) {
+                int lin = origemLinha + (i - HAB_ORIGEM);
+                int col = origemColuna + (j - HAB_ORIGEM);
+
+                // Verifica se está dentro dos limites do tabuleiro
+                if (lin >= 0 && lin < TAM && col >= 0 && col < TAM) {
+                    if (tabuleiro[lin][col] == 0) {
+                        tabuleiro[lin][col] = 5; // Marca área afetada pela habilidade
+                    }
+                }
+            }
+        }
+    }
+}
+
 int main() {
-    // Inicializa todas as posições do tabuleiro com 0 (água)
-    int tabuleiro[10][10];
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
+    int tabuleiro[TAM][TAM];
+
+    // Inicializa o tabuleiro com água (0)
+    for (int i = 0; i < TAM; i++) {
+        for (int j = 0; j < TAM; j++) {
             tabuleiro[i][j] = 0;
         }
     }
 
-    // Define valor dos navios
-    int navio1 = 3;
-    int navio2 = 3;
-    int navio3 = 3;
-    int navio4 = 3;
+    // Define navios
+    int navio = 3;
 
-    // Posiciona navio1 na linha 6, colunas 3, 4, 5 (índices: linha 6 = i=6, colunas j=3,4,5)
-    tabuleiro[6][3] = navio1;
-    tabuleiro[6][4] = navio1;
-    tabuleiro[6][5] = navio1;
+    // Posicionamento dos navios
+    tabuleiro[6][3] = navio; tabuleiro[6][4] = navio; tabuleiro[6][5] = navio;
+    tabuleiro[0][6] = navio; tabuleiro[1][6] = navio; tabuleiro[2][6] = navio;
+    tabuleiro[1][1] = navio; tabuleiro[2][2] = navio; tabuleiro[3][3] = navio;
+    tabuleiro[0][9] = navio; tabuleiro[1][8] = navio; tabuleiro[2][7] = navio;
 
-    // Posiciona navio2 na coluna 6, linhas 1, 2, 3 (índices: coluna 6 = j=6, linhas i=0,1,2)
-    tabuleiro[0][6] = navio2;
-    tabuleiro[1][6] = navio2;
-    tabuleiro[2][6] = navio2;
+    // Matrizes das habilidades
+    int cone[HAB][HAB];
+    int cruz[HAB][HAB];
+    int octaedro[HAB][HAB];
 
-    // Posicionamento dos navios 3 e 4 em diagonais 
-    tabuleiro[1][1] = navio3;
-    tabuleiro[2][2] = navio3;
-    tabuleiro[3][3] = navio3;
+    // Construir Cone (formato triangular com base embaixo)
+    for (int i = 0; i < HAB; i++) {
+        for (int j = 0; j < HAB; j++) {
+            if (j >= HAB_ORIGEM - i && j <= HAB_ORIGEM + i) {
+                cone[i][j] = 1;
+            } else {
+                cone[i][j] = 0;
+            }
+        }
+    }
 
-    tabuleiro[0][9] = navio4;
-    tabuleiro[1][8] = navio4;
-    tabuleiro[2][7] = navio4;
+    // Construir Cruz (linha central e coluna central)
+    for (int i = 0; i < HAB; i++) {
+        for (int j = 0; j < HAB; j++) {
+            if (i == HAB_ORIGEM || j == HAB_ORIGEM) {
+                cruz[i][j] = 1;
+            } else {
+                cruz[i][j] = 0;
+            }
+        }
+    }
 
+    // Construir Octaedro (losango)
+for (int i = 0; i < HAB; i++) {
+    for (int j = 0; j < HAB; j++) {
+        int dist_i = (i > HAB_ORIGEM) ? (i - HAB_ORIGEM) : (HAB_ORIGEM - i);
+        int dist_j = (j > HAB_ORIGEM) ? (j - HAB_ORIGEM) : (HAB_ORIGEM - j);
 
-    // Exibe o tabuleiro com cabeçalho formatado (A-J para colunas, 1-10 para linhas)
+        if (dist_i + dist_j <= 2) {
+            octaedro[i][j] = 1;
+        } else {
+            octaedro[i][j] = 0;
+        }
+    }
+}
+
+    // Aplicar habilidades no tabuleiro
+    aplicarHabilidade(tabuleiro, cone, 2, 2);       // Cone centrado em (2,2)
+    aplicarHabilidade(tabuleiro, cruz, 7, 7);       // Cruz centrada em (7,7)
+    aplicarHabilidade(tabuleiro, octaedro, 5, 5);   // Octaedro centrado em (5,5)
+
+    // Exibe o tabuleiro
     printf("Tabuleiro de Batalha Naval\n");
     printf("   ");
     for (char letra = 'A'; letra <= 'J'; letra++) {
@@ -43,14 +97,15 @@ int main() {
     }
     printf("\n");
 
-    for (int i = 0; i < 10; i++) {
-        if (i < 9) {
-            printf("%d  ", i + 1);
-        } else {
-            printf("%d ", i + 1);  // Alinhamento para 10
-        }
-        for (int j = 0; j < 10; j++) {
-            printf("%d ", tabuleiro[i][j]);
+    for (int i = 0; i < TAM; i++) {
+        printf("%2d ", i + 1);
+        for (int j = 0; j < TAM; j++) {
+            if (tabuleiro[i][j] == 0)
+                printf(". ");
+            else if (tabuleiro[i][j] == 3)
+                printf("N ");
+            else if (tabuleiro[i][j] == 5)
+                printf("* ");
         }
         printf("\n");
     }
